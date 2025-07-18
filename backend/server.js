@@ -17,7 +17,9 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Routes
 const authRoutes = require('./routes/authRoutes');
+const productsRoute = require('./routes/poducts');
 app.use('/api/auth', authRoutes);
+app.use('/api/products', productsRoute);
 
 // Start Server
 const PORT = process.env.PORT || 5000;

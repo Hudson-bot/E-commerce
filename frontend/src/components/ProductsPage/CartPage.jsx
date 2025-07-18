@@ -1,57 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+// src/components/CartPage.jsx
+import React, { useContext } from 'react';
+import { Link } from 'react-router-dom';
+import { CartContext } from '../../context/CartContext.jsx';
 
 const CartPage = () => {
-  const [cart, setCart] = useState({});
-  const location = useLocation();
-
-  // Reload cart every time the route changes (on page load and navigation)
-  useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) setCart(JSON.parse(savedCart));
-    else setCart({});
-  }, [location]);
-
-  const increaseQty = (productId) => {
-    setCart((prevCart) => ({
-      ...prevCart,
-      [productId]: {
-        product: prevCart[productId].product,
-        quantity: prevCart[productId].quantity + 1,
-      },
-    }));
-  };
-
-  const decreaseQty = (productId) => {
-    setCart((prevCart) => {
-      const currentQty = prevCart[productId].quantity;
-      if (currentQty <= 1) {
-        const newCart = { ...prevCart };
-        delete newCart[productId];
-        return newCart;
-      }
-      return {
-        ...prevCart,
-        [productId]: {
-          product: prevCart[productId].product,
-          quantity: currentQty - 1,
-        },
-      };
-    });
-  };
-
-  const removeItem = (productId) => {
-    setCart((prevCart) => {
-      const newCart = { ...prevCart };
-      delete newCart[productId];
-      return newCart;
-    });
-  };
-
-  // Save cart to localStorage whenever cart changes
-  useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart));
-  }, [cart]);
+  const { cart, updateQuantity, removeFromCart, cartCount } = useContext(CartContext);
 
   const totalPrice = Object.values(cart).reduce(
     (acc, item) => acc + item.product.price * item.quantity,
@@ -62,7 +15,7 @@ const CartPage = () => {
     <div className="min-h-screen bg-gray-100 p-6 max-w-4xl mx-auto">
       <h1 className="text-4xl font-bold text-purple-700 mb-8 text-center">Shopping Cart</h1>
 
-      {Object.keys(cart).length === 0 ? (
+      {cartCount === 0 ? (
         <p className="text-center text-gray-600">Your cart is empty.</p>
       ) : (
         <>
@@ -87,7 +40,7 @@ const CartPage = () => {
                 </div>
                 <div className="flex items-center space-x-3">
                   <button
-                    onClick={() => decreaseQty(product.id)}
+                    onClick={() => updateQuantity(product.id, quantity - 1)}
                     className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
                     aria-label={`Decrease quantity of ${product.name}`}
                   >
@@ -95,14 +48,14 @@ const CartPage = () => {
                   </button>
                   <span className="text-lg font-medium">{quantity}</span>
                   <button
-                    onClick={() => increaseQty(product.id)}
+                    onClick={() => updateQuantity(product.id, quantity + 1)}
                     className="px-3 py-1 bg-purple-700 text-white rounded hover:bg-purple-800"
                     aria-label={`Increase quantity of ${product.name}`}
                   >
                     +
                   </button>
                   <button
-                    onClick={() => removeItem(product.id)}
+                    onClick={() => removeFromCart(product.id)}
                     className="text-red-600 hover:text-red-800 ml-4"
                     aria-label={`Remove ${product.name} from cart`}
                   >

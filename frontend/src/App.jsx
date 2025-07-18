@@ -6,9 +6,11 @@ import React from 'react';
 import ProductsPage from './components/ProductsPage/ProductsPage';
 import CartPage from './components/ProductsPage/CartPage';
 import Navbar from './components/NavBar/Navbar';
+import { CartProvider } from './context/CartContext.jsx';
 
 function App() {
   return (
+    <CartProvider>
     <Router>
       <Navbar />
       <Routes>
@@ -20,6 +22,7 @@ function App() {
         <Route path="/cart" element={<CartPage />} />
       </Routes>
     </Router>
+    </CartProvider>
   );
 }
 
